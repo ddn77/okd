@@ -2,5 +2,4 @@ FROM ubuntu:xenial-20180705
 MAINTAINER TIGER
 
 RUN apt-get update && apt-get install -y apache2
-service apache2 start
-#CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
