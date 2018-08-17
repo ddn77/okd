@@ -4,15 +4,17 @@ MAINTAINER TIGER
 RUN apt-get update && apt-get install -y apache2
 
 ### Setup user for build execution and application runtime
-ENV APP_ROOT=/var
-USER root
-RUN chmod -R u+x /usr/sbin && \
-    chgrp -R 0 ${APP_ROOT} && \
-    chmod -R g=u ${APP_ROOT} /etc/passwd
-RUN chgrp -R 0 /var && \
-    chmod -R g=u /var
+
+ENV HTTPD_PREFIX /usr/local/apache2
+ENV PATH $HTTPD_PREFIX/bin:$PATH
+RUN mkdir -p "$HTTPD_PREFIX" \
+	&& chown www-data:www-data "$HTTPD_PREFIX"
+
+WORKDIR $HTTPD_PREFIX
+
+EXPOSE 80
     
 ### Containers should NOT run as root as a good practice
-USER 10001
+
 
 CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
