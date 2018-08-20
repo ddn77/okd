@@ -38,15 +38,15 @@ objects:
       name: "${NAME}"
 - kind: "PersistentVolumeClaim"
   apiVersion: v1
-    metadata:
-      name: "${NAME}"
-    spec:
-      accessModes:
-        - "ReadWriteOnce"
-      resources:
-        requests:
-          storage: "1Gi"
-      volumeName: "pv1"
+  metadata:
+    name: "web-pvol1"
+  spec:
+    accessModes:
+      - "ReadWriteOnce"
+    resources:
+      requests:
+        storage: "1Gi"
+    volumeName: "pv0001"
 - kind: Route
   apiVersion: v1
   metadata:
@@ -102,7 +102,7 @@ objects:
       template.alpha.openshift.io/wait-for-ready: 'true'
   spec:
     strategy:
-      type: Rolling
+      type: Recreate
     triggers:
     - type: ImageChange
       imageChangeParams:
@@ -122,6 +122,10 @@ objects:
         labels:
           name: "${NAME}"
       spec:
+        volumes:
+        - name: "${NAME}-data"
+          persistentVolumeClaim:
+            claimName: "web-pvol1"
         containers:
         - name: web-example
           image: " "
@@ -139,6 +143,9 @@ objects:
             httpGet:
               path: "/"
               port: 80
+          volumeMounts:
+          - name: "${NAME}-data"
+            mountPath: "/var/www/html"
           resources:
             limits:
               memory: "${MEMORY_LIMIT}"
